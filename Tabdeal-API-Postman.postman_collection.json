@@ -4493,6 +4493,665 @@
 					}
 				}
 			]
+		},
+		{
+			"name": "Futures (FAPI)",
+			"item": [
+				{
+					"name": "Market Data (Public)",
+					"item": [
+						{
+							"name": "Ping",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/r/fapi/v1/ping",
+									"host": ["{{domain}}"],
+									"path": ["r", "fapi", "v1", "ping"]
+								},
+								"description": "Connectivity check. Returns empty object {}."
+							},
+							"response": []
+						},
+						{
+							"name": "Server Time",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/r/fapi/v1/time",
+									"host": ["{{domain}}"],
+									"path": ["r", "fapi", "v1", "time"]
+								},
+								"description": "Returns server time in milliseconds: {\"serverTime\": <int ms>}."
+							},
+							"response": []
+						},
+						{
+							"name": "Exchange Info",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/r/fapi/v1/exchangeInfo?symbol=BTCUSDT",
+									"host": ["{{domain}}"],
+									"path": ["r", "fapi", "v1", "exchangeInfo"],
+									"query": [
+										{
+											"key": "symbol",
+											"value": "BTCUSDT",
+											"description": "Optional. Single symbol filter."
+										},
+										{
+											"key": "symbols",
+											"value": "BTCUSDT,ETHUSDT",
+											"description": "Optional. Comma-separated symbol list.",
+											"disabled": true
+										}
+									]
+								},
+								"description": "Returns active futures markets with filters. Omit symbol/symbols to get all markets."
+							},
+							"response": []
+						},
+						{
+							"name": "Order Book (Depth)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/r/fapi/v1/depth?symbol=BTCUSDT&limit=50",
+									"host": ["{{domain}}"],
+									"path": ["r", "fapi", "v1", "depth"],
+									"query": [
+										{
+											"key": "symbol",
+											"value": "BTCUSDT",
+											"description": "Required. Market symbol."
+										},
+										{
+											"key": "limit",
+											"value": "50",
+											"description": "Optional. Number of levels (default 100, min 5, max 100)."
+										}
+									]
+								},
+								"description": "Returns order book snapshot: {lastUpdateId, E, bids, asks}."
+							},
+							"response": []
+						},
+						{
+							"name": "Aggregated Depth (Agg Depth)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/r/fapi/v1/aggDepth?symbol=BTCUSDT&aggregationPrecision=10",
+									"host": ["{{domain}}"],
+									"path": ["r", "fapi", "v1", "aggDepth"],
+									"query": [
+										{
+											"key": "symbol",
+											"value": "BTCUSDT",
+											"description": "Required."
+										},
+										{
+											"key": "aggregationPrecision",
+											"value": "10",
+											"description": "Required. Price aggregation step (must be > 0)."
+										},
+										{
+											"key": "limitRows",
+											"value": "20",
+											"description": "Optional. Max output rows.",
+											"disabled": true
+										}
+									]
+								},
+								"description": "Returns aggregated order book based on aggregationPrecision step."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Orders",
+					"item": [
+						{
+							"name": "Place Order",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{"key": "symbol", "value": "BTCUSDT", "type": "text"},
+										{"key": "side", "value": "BUY", "type": "text", "description": "BUY or SELL"},
+										{"key": "type", "value": "LIMIT", "type": "text", "description": "LIMIT or MARKET"},
+										{"key": "quantity", "value": "0.01", "type": "text"},
+										{"key": "price", "value": "39500", "type": "text", "description": "Required for LIMIT"},
+										{"key": "timeInForce", "value": "GTC", "type": "text", "description": "GTC, IOC, FOK (default GTC)", "disabled": true},
+										{"key": "reduceOnly", "value": "false", "type": "text", "disabled": true},
+										{"key": "newClientOrderId", "value": "", "type": "text", "disabled": true},
+										{"key": "timestamp", "value": "{{timestamp}}", "type": "text"},
+										{"key": "signature", "value": "{{signature}}", "type": "text"},
+										{"key": "recvWindow", "value": "{{receive_window}}", "type": "text"}
+									]
+								},
+								"url": {
+									"raw": "{{domain}}/fapi/v1/order",
+									"host": ["{{domain}}"],
+									"path": ["fapi", "v1", "order"]
+								},
+								"description": "Place a new futures order. Only LIMIT and MARKET types are supported."
+							},
+							"response": []
+						},
+						{
+							"name": "Query Order",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/r/fapi/v1/order?symbol=BTCUSDT&orderId=5001&timestamp={{timestamp}}&signature={{signature}}&recvWindow={{receive_window}}",
+									"host": ["{{domain}}"],
+									"path": ["r", "fapi", "v1", "order"],
+									"query": [
+										{"key": "symbol", "value": "BTCUSDT"},
+										{"key": "orderId", "value": "5001"},
+										{"key": "origClientOrderId", "value": "", "disabled": true, "description": "Not supported currently"},
+										{"key": "timestamp", "value": "{{timestamp}}"},
+										{"key": "signature", "value": "{{signature}}"},
+										{"key": "recvWindow", "value": "{{receive_window}}"}
+									]
+								},
+								"description": "Query a single futures order by orderId."
+							},
+							"response": []
+						},
+						{
+							"name": "Cancel Order",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/fapi/v1/order?symbol=BTCUSDT&orderId=5001&timestamp={{timestamp}}&signature={{signature}}&recvWindow={{receive_window}}",
+									"host": ["{{domain}}"],
+									"path": ["fapi", "v1", "order"],
+									"query": [
+										{"key": "symbol", "value": "BTCUSDT"},
+										{"key": "orderId", "value": "5001"},
+										{"key": "timestamp", "value": "{{timestamp}}"},
+										{"key": "signature", "value": "{{signature}}"},
+										{"key": "recvWindow", "value": "{{receive_window}}"}
+									]
+								},
+								"description": "Cancel a futures order by orderId."
+							},
+							"response": []
+						},
+						{
+							"name": "Open Orders",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/r/fapi/v1/openOrders?symbol=BTCUSDT&timestamp={{timestamp}}&signature={{signature}}&recvWindow={{receive_window}}",
+									"host": ["{{domain}}"],
+									"path": ["r", "fapi", "v1", "openOrders"],
+									"query": [
+										{"key": "symbol", "value": "BTCUSDT", "description": "Optional. Omit to get all symbols."},
+										{"key": "limit", "value": "50", "disabled": true, "description": "Optional. Default 50, min 1, max 100."},
+										{"key": "timestamp", "value": "{{timestamp}}"},
+										{"key": "signature", "value": "{{signature}}"},
+										{"key": "recvWindow", "value": "{{receive_window}}"}
+									]
+								},
+								"description": "List open futures orders. Omit symbol to get open orders across all symbols."
+							},
+							"response": []
+						},
+						{
+							"name": "All Orders",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/r/fapi/v1/allOrders?symbol=BTCUSDT&timestamp={{timestamp}}&signature={{signature}}&recvWindow={{receive_window}}",
+									"host": ["{{domain}}"],
+									"path": ["r", "fapi", "v1", "allOrders"],
+									"query": [
+										{"key": "symbol", "value": "BTCUSDT", "description": "Required."},
+										{"key": "orderId", "value": "", "disabled": true, "description": "Optional. Not used by server currently."},
+										{"key": "startTime", "value": "", "disabled": true, "description": "Optional. ms timestamp."},
+										{"key": "endTime", "value": "", "disabled": true, "description": "Optional. ms timestamp."},
+										{"key": "isActive", "value": "1", "disabled": true, "description": "Optional. 1=active, other=closed, empty=no filter."},
+										{"key": "isDone", "value": "1", "disabled": true, "description": "Optional. 1=filled, 0=cancelled, empty=no filter."},
+										{"key": "limit", "value": "50", "disabled": true, "description": "Optional. Default 50, min 1, max 100."},
+										{"key": "timestamp", "value": "{{timestamp}}"},
+										{"key": "signature", "value": "{{signature}}"},
+										{"key": "recvWindow", "value": "{{receive_window}}"}
+									]
+								},
+								"description": "List all historical orders for a symbol (open and closed). Filter by startTime/endTime."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Leverage",
+					"item": [
+						{
+							"name": "Get Leverage",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/r/fapi/v1/leverage?symbol=BTCUSDT&timestamp={{timestamp}}&signature={{signature}}&recvWindow={{receive_window}}",
+									"host": ["{{domain}}"],
+									"path": ["r", "fapi", "v1", "leverage"],
+									"query": [
+										{"key": "symbol", "value": "BTCUSDT", "description": "Required."},
+										{"key": "timestamp", "value": "{{timestamp}}"},
+										{"key": "signature", "value": "{{signature}}"},
+										{"key": "recvWindow", "value": "{{receive_window}}"}
+									]
+								},
+								"description": "Query current leverage for a symbol. Returns {leverage, symbol}."
+							},
+							"response": []
+						},
+						{
+							"name": "Set Leverage",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{"key": "symbol", "value": "BTCUSDT", "type": "text"},
+										{"key": "leverage", "value": "10", "type": "text", "description": "Min 1"},
+										{"key": "timestamp", "value": "{{timestamp}}", "type": "text"},
+										{"key": "signature", "value": "{{signature}}", "type": "text"},
+										{"key": "recvWindow", "value": "{{receive_window}}", "type": "text"}
+									]
+								},
+								"url": {
+									"raw": "{{domain}}/fapi/v1/leverage",
+									"host": ["{{domain}}"],
+									"path": ["fapi", "v1", "leverage"]
+								},
+								"description": "Set leverage for a futures symbol. Returns {leverage, symbol}."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Transfers",
+					"item": [
+						{
+							"name": "Create Transfer",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{"key": "type", "value": "2", "type": "text", "description": "2=spot→futures, 1=futures→spot"},
+										{"key": "amount", "value": "200", "type": "text"},
+										{"key": "asset", "value": "USDT", "type": "text"},
+										{"key": "timestamp", "value": "{{timestamp}}", "type": "text"},
+										{"key": "signature", "value": "{{signature}}", "type": "text"},
+										{"key": "recvWindow", "value": "{{receive_window}}", "type": "text"}
+									]
+								},
+								"url": {
+									"raw": "{{domain}}/fapi/v1/transfer",
+									"host": ["{{domain}}"],
+									"path": ["fapi", "v1", "transfer"]
+								},
+								"description": "Transfer asset between spot wallet and futures wallet. type 2 = spot→futures, type 1 = futures→spot."
+							},
+							"response": []
+						},
+						{
+							"name": "Transfer History",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/r/fapi/v1/transfer?timestamp={{timestamp}}&signature={{signature}}&recvWindow={{receive_window}}",
+									"host": ["{{domain}}"],
+									"path": ["r", "fapi", "v1", "transfer"],
+									"query": [
+										{"key": "type", "value": "1", "disabled": true, "description": "Optional. 2=to futures, 1=from futures."},
+										{"key": "startTime", "value": "", "disabled": true, "description": "Optional. ms timestamp."},
+										{"key": "endTime", "value": "", "disabled": true, "description": "Optional. ms timestamp."},
+										{"key": "limit", "value": "50", "disabled": true, "description": "Optional. Default 50, min 1, max 100."},
+										{"key": "purpose", "value": "", "disabled": true, "description": "Optional. Transfer purpose filter."},
+										{"key": "revoked", "value": "", "disabled": true, "description": "Optional. Not used by server currently."},
+										{"key": "timestamp", "value": "{{timestamp}}"},
+										{"key": "signature", "value": "{{signature}}"},
+										{"key": "recvWindow", "value": "{{receive_window}}"}
+									]
+								},
+								"description": "Query transfer history between spot and futures wallets."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Trade History",
+					"item": [
+						{
+							"name": "User Trades",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/r/fapi/v1/userTrades?symbol=BTCUSDT&timestamp={{timestamp}}&signature={{signature}}&recvWindow={{receive_window}}",
+									"host": ["{{domain}}"],
+									"path": ["r", "fapi", "v1", "userTrades"],
+									"query": [
+										{"key": "symbol", "value": "BTCUSDT", "description": "Required."},
+										{"key": "startTime", "value": "", "disabled": true, "description": "Optional. ms timestamp."},
+										{"key": "endTime", "value": "", "disabled": true, "description": "Optional. ms timestamp."},
+										{"key": "limit", "value": "50", "disabled": true, "description": "Optional. Default 50, min 1, max 100."},
+										{"key": "timestamp", "value": "{{timestamp}}"},
+										{"key": "signature", "value": "{{signature}}"},
+										{"key": "recvWindow", "value": "{{receive_window}}"}
+									]
+								},
+								"description": "List user trade fills for a futures symbol."
+							},
+							"response": []
+						},
+						{
+							"name": "Income History",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/r/fapi/v1/income?timestamp={{timestamp}}&signature={{signature}}&recvWindow={{receive_window}}",
+									"host": ["{{domain}}"],
+									"path": ["r", "fapi", "v1", "income"],
+									"query": [
+										{"key": "symbol", "value": "BTCUSDT", "disabled": true, "description": "Optional."},
+										{"key": "incomeType", "value": "TradePNL", "disabled": true, "description": "Optional. Transfer|TakerCommission|MakerCommission|TradePNL|AdlPNL|Liquidation|InsuranceFund"},
+										{"key": "startTime", "value": "", "disabled": true, "description": "Optional. ms timestamp."},
+										{"key": "endTime", "value": "", "disabled": true, "description": "Optional. ms timestamp."},
+										{"key": "limit", "value": "100", "disabled": true, "description": "Optional. Default 100, min 1, max 100."},
+										{"key": "timestamp", "value": "{{timestamp}}"},
+										{"key": "signature", "value": "{{signature}}"},
+										{"key": "recvWindow", "value": "{{receive_window}}"}
+									]
+								},
+								"description": "Balance/PnL change log (commission, transfer, realized PnL, etc.)."
+							},
+							"response": []
+						},
+						{
+							"name": "Force Orders (Liquidations)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/r/fapi/v1/forceOrders?timestamp={{timestamp}}&signature={{signature}}&recvWindow={{receive_window}}",
+									"host": ["{{domain}}"],
+									"path": ["r", "fapi", "v1", "forceOrders"],
+									"query": [
+										{"key": "symbol", "value": "BTCUSDT", "disabled": true, "description": "Optional."},
+										{"key": "timestamp", "value": "{{timestamp}}"},
+										{"key": "signature", "value": "{{signature}}"},
+										{"key": "recvWindow", "value": "{{receive_window}}"}
+									]
+								},
+								"description": "List liquidation/forced orders. Max 100 records returned."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Positions",
+					"item": [
+						{
+							"name": "Position History",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/r/fapi/v1/position?timestamp={{timestamp}}&signature={{signature}}&recvWindow={{receive_window}}",
+									"host": ["{{domain}}"],
+									"path": ["r", "fapi", "v1", "position"],
+									"query": [
+										{"key": "symbol", "value": "BTCUSDT", "disabled": true, "description": "Optional."},
+										{"key": "side", "value": "BUY", "disabled": true, "description": "Optional. BUY or SELL."},
+										{"key": "state", "value": "", "disabled": true, "description": "Optional. Internal position state filter."},
+										{"key": "isActive", "value": "1", "disabled": true, "description": "Optional. 1=active only, 0=closed only."},
+										{"key": "startTime", "value": "", "disabled": true, "description": "Optional. ms timestamp."},
+										{"key": "endTime", "value": "", "disabled": true, "description": "Optional. ms timestamp."},
+										{"key": "limit", "value": "50", "disabled": true, "description": "Optional. Default 50, min 1, max 100."},
+										{"key": "timestamp", "value": "{{timestamp}}"},
+										{"key": "signature", "value": "{{signature}}"},
+										{"key": "recvWindow", "value": "{{receive_window}}"}
+									]
+								},
+								"description": "Query position history (open and closed) with optional filters."
+							},
+							"response": []
+						},
+						{
+							"name": "Close Position",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/fapi/v1/position?symbol=BTCUSDT&timestamp={{timestamp}}&signature={{signature}}&recvWindow={{receive_window}}",
+									"host": ["{{domain}}"],
+									"path": ["fapi", "v1", "position"],
+									"query": [
+										{"key": "symbol", "value": "BTCUSDT", "description": "Required."},
+										{"key": "timestamp", "value": "{{timestamp}}"},
+										{"key": "signature", "value": "{{signature}}"},
+										{"key": "recvWindow", "value": "{{receive_window}}"}
+									]
+								},
+								"description": "Market-close all open position for a symbol. Returns {\"msg\": \"success\"}."
+							},
+							"response": []
+						},
+						{
+							"name": "Set Position SL/TP",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{"key": "positionId", "value": "7001", "type": "text", "description": "Required. Position ID."},
+										{"key": "symbol", "value": "BTCUSDT", "type": "text", "disabled": true, "description": "Optional. For extra validation."},
+										{"key": "slPrice", "value": "39000", "type": "text", "description": "Optional. Stop-loss price. At least one of slPrice/tpPrice required."},
+										{"key": "tpPrice", "value": "41000", "type": "text", "description": "Optional. Take-profit price.", "disabled": true},
+										{"key": "workingType", "value": "MARK_PRICE", "type": "text", "disabled": true, "description": "Optional. MARK_PRICE or CONTRACT_PRICE."},
+										{"key": "timestamp", "value": "{{timestamp}}", "type": "text"},
+										{"key": "signature", "value": "{{signature}}", "type": "text"},
+										{"key": "recvWindow", "value": "{{receive_window}}", "type": "text"}
+									]
+								},
+								"url": {
+									"raw": "{{domain}}/fapi/v1/positionSlTp",
+									"host": ["{{domain}}"],
+									"path": ["fapi", "v1", "positionSlTp"]
+								},
+								"description": "Set or replace SL/TP trigger prices for an open position."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Account",
+					"item": [
+						{
+							"name": "Position Risk",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/r/fapi/v3/positionRisk?timestamp={{timestamp}}&signature={{signature}}&recvWindow={{receive_window}}",
+									"host": ["{{domain}}"],
+									"path": ["r", "fapi", "v3", "positionRisk"],
+									"query": [
+										{"key": "symbol", "value": "BTCUSDT", "disabled": true, "description": "Optional."},
+										{"key": "timestamp", "value": "{{timestamp}}"},
+										{"key": "signature", "value": "{{signature}}"},
+										{"key": "recvWindow", "value": "{{receive_window}}"}
+									]
+								},
+								"description": "Get open positions with risk data (Binance-like fields: positionAmt, entryPrice, markPrice, unRealizedProfit, liquidationPrice, leverage)."
+							},
+							"response": []
+						},
+						{
+							"name": "Account Info",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/r/fapi/v3/account?timestamp={{timestamp}}&signature={{signature}}&recvWindow={{receive_window}}",
+									"host": ["{{domain}}"],
+									"path": ["r", "fapi", "v3", "account"],
+									"query": [
+										{"key": "timestamp", "value": "{{timestamp}}"},
+										{"key": "signature", "value": "{{signature}}"},
+										{"key": "recvWindow", "value": "{{receive_window}}"}
+									]
+								},
+								"description": "Full account snapshot: canTrade, canDeposit, canWithdraw, assets[], positions[]."
+							},
+							"response": []
+						},
+						{
+							"name": "Balance",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{domain}}/r/fapi/v3/balance?timestamp={{timestamp}}&signature={{signature}}&recvWindow={{receive_window}}",
+									"host": ["{{domain}}"],
+									"path": ["r", "fapi", "v3", "balance"],
+									"query": [
+										{"key": "timestamp", "value": "{{timestamp}}"},
+										{"key": "signature", "value": "{{signature}}"},
+										{"key": "recvWindow", "value": "{{receive_window}}"}
+									]
+								},
+								"description": "Wallet balances per asset: walletBalance, availableBalance, crossWalletBalance, crossUnPnl."
+							},
+							"response": []
+						}
+					]
+				}
+			],
+			"auth": {
+				"type": "apikey",
+				"apikey": [
+					{
+						"key": "value",
+						"value": "{{api-key}}",
+						"type": "string"
+					},
+					{
+						"key": "key",
+						"value": "X-MBX-APIKEY",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"const ts  = Date.now();",
+							"pm.environment.set(\"timestamp\", ts);",
+							"",
+							"let paramsObject = {};",
+							"",
+							"const api_secret = pm.environment.get(\"api-secret\");",
+							"const recvWindow = pm.environment.get(\"receive_window\");",
+							"",
+							"let parameters = {}",
+							"",
+							"if (pm.request.method == \"GET\")",
+							"    parameters = pm.request.url.query;",
+							"else if (pm.request.method == \"POST\")",
+							"    parameters = pm.request.body.formdata;",
+							"else if (pm.request.method == \"DELETE\")",
+							"    parameters = pm.request.url.query;",
+							"else if (pm.request.method == \"PUT\")",
+							"    parameters = pm.request.body.formdata;",
+							"",
+							"parameters.map((param) => {",
+							"    if (param.key != 'signature' && ",
+							"        param.key != 'timestamp' && ",
+							"        param.key != 'recvWindow' &&",
+							"        !is_empty(param.value) &&",
+							"        !is_disabled(param.disabled)) {",
+							"            paramsObject[param.key] = param.value;",
+							"    }",
+							"})",
+							"        ",
+							"Object.assign(paramsObject, {'timestamp': ts});",
+							"Object.assign(paramsObject, {'recvWindow': recvWindow});",
+							"",
+							"if (api_secret) {",
+							"    const queryString = Object.keys(paramsObject).map((key) => {",
+							"        return `${key}=${paramsObject[key]}`;",
+							"    }).join('&');",
+							"    console.log(queryString);",
+							"    const signature = CryptoJS.HmacSHA256(queryString, api_secret).toString();",
+							"    pm.environment.set(\"signature\", signature);",
+							"}",
+							"",
+							"",
+							"function is_disabled(str) {",
+							"    return str == true;",
+							"}",
+							"",
+							"function is_empty(str) {",
+							"    if (typeof str == 'undefined' ||",
+							"        !str || ",
+							"        str.length === 0 || ",
+							"        str === \"\" ||",
+							"        !/[^\\s]/.test(str) ||",
+							"        /^\\s*$/.test(str) ||",
+							"        str.replace(/\\s/g,\"\") === \"\")",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"}"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [""]
+					}
+				}
+			]
 		}
 	],
 	"event": [
